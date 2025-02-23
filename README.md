@@ -1,4 +1,4 @@
-# LinkedIn Post Agent 
+# LinkedIn Marketing Agent 
 
 A Python-based tool that automatically generates professional LinkedIn posts by combining AI research and formatting capabilities.
 
