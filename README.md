@@ -30,7 +30,7 @@ Agentic features coming soon
 
 ## Requirements
 
-Python 3.8 or higher
+Python 3.8+
 
 Perplexity AI API key
 
