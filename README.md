@@ -3,7 +3,7 @@
 A Python-based tool that automatically generates professional LinkedIn posts by combining AI research and formatting capabilities.
 
 ## Features
-- AI-powered research using Perplexity AI
+- AI-powered research with data and stats using Perplexity AI
 - Professional post formatting with Claude
 - Automated post structure with emojis
 - Secure API handling
