@@ -1,6 +1,10 @@
 # LinkedIn Post Generator with AI Research
 
-A Python-based tool that automatically generates professional LinkedIn posts by combining AI research and formatting capabilities.
+A Python-based tool that automatically generates professional LinkedIn posts by combining AI research and formatting capabilities. The script asks the user what kind of post they would like by asking the following questions: 
+
+1. What topic the agent should research
+2. The structure of the post 
+3. Length of the post 
 
 ## Features
 - AI-powered research using Perplexity AI
