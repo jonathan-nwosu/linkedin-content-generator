@@ -39,6 +39,10 @@ class PostFormatter:
     def format_post(self, research_content: str, config: PostConfig) -> str:
         """Abstract method to be implemented by child classes"""
         raise NotImplementedError("Subclasses must implement format_post")
+        
+    def revise_post(self, original_post: str, feedback: str) -> str:
+        """Abstract method to be implemented by child classes"""
+        raise NotImplementedError("Subclasses must implement revise_post")
 
 
 class ClaudePostFormatter(PostFormatter):
@@ -177,6 +181,40 @@ class ClaudePostFormatter(PostFormatter):
         )
         
         return message.content[0].text.strip()
+        
+    def _create_revision_prompt(self, original_post: str, feedback: str) -> str:
+        """Create the prompt for revising a post based on feedback"""
+        return f"""I need you to revise a LinkedIn post based on specific feedback.
+
+Original LinkedIn Post:
+---
+{original_post}
+---
+
+Feedback to incorporate:
+---
+{feedback}
+---
+
+Please provide a revised version of the post that addresses all the feedback while maintaining the overall structure and tone. 
+Keep the same post format (emoji usage, sections, etc.) unless specifically requested to change in the feedback.
+Return just the revised post as plain text with proper line breaks, without any additional explanation.
+"""
+
+    def revise_post(self, original_post: str, feedback: str) -> str:
+        """Revise a LinkedIn post based on user feedback."""
+        prompt = self._create_revision_prompt(original_post, feedback)
+
+        message = self.anthropic.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1000,
+            messages=[{
+                "role": "user",
+                "content": prompt
+            }]
+        )
+        
+        return message.content[0].text.strip()
 
 
 class ContentResearcher:
@@ -258,7 +296,7 @@ class PerplexityResearcher(ContentResearcher):
 
 
 class LinkedInPostGenerator:
-    """Main class that orchestrates the post generation process"""
+    """Main class that orchestrates the post generation process with feedback mechanism"""
     
     def __init__(self):
         load_dotenv()
@@ -338,14 +376,59 @@ class LinkedInPostGenerator:
         formatted_post = self.formatter.format_post(research_content, config)
         
         return formatted_post
+    
+    def feedback_loop(self) -> str:
+        """Run the post generation with feedback loop"""
+        
+        # Step 1: Generate initial post
+        config = self.get_user_preferences()
+        initial_post = self.generate_post(config)
+        
+        print("\nYour LinkedIn Post:\n")
+        print(initial_post)
+        
+        # Step 2: Feedback loop
+        while True:
+            print("\n=== Post Feedback Options ===")
+            print("1. Revise the post with feedback")
+            print("2. Accept the post as is")
+            print("3. Start over with a new post")
+            
+            choice = input("\nEnter your choice (1-3): ")
+            
+            if choice == "1":
+                print("\nPlease provide your feedback and requested changes:")
+                feedback = input("Feedback: ")
+                
+                print("\nRevising your post...")
+                revised_post = self.formatter.revise_post(initial_post, feedback)
+                
+                print("\nRevised LinkedIn Post:\n")
+                print(revised_post)
+                
+                initial_post = revised_post  # Update post for potential further revisions
+            
+            elif choice == "2":
+                print("\nPost accepted. Thank you for using the LinkedIn Post Generator!")
+                return initial_post
+            
+            elif choice == "3":
+                print("\nStarting over with a new post...")
+                return self.feedback_loop()  # Restart the process
+            
+            else:
+                print("\nInvalid choice. Please try again.")
 
 
 def main():
     try:
         generator = LinkedInPostGenerator()
-        formatted_post = generator.generate_post()
-        print("\nYour LinkedIn Post:\n")
-        print(formatted_post)
+        
+        print("\n=== LinkedIn Post Generator with Feedback ===\n")
+        print("This tool will help you create a LinkedIn post and refine it with your feedback.")
+        
+        generator.feedback_loop()
+        
     except Exception as e:
         print(f"An error occurred: {e}")
 
