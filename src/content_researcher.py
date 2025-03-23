@@ -1,3 +1,4 @@
+#importing necessary python packages 
 from openai import OpenAI
 import os
 from typing import List, Dict, Optional
@@ -6,8 +7,9 @@ from dotenv import load_dotenv
 from anthropic import Anthropic
 
 
+"""Enum defining different LinkedIn post formats. An Enom (enumerator) is a class that defines a set of named constants.A way to create a group
+of related values with the same constants. """
 class PostFormat(Enum):
-    """Enum defining different LinkedIn post formats"""
     FACTS_WITH_EMOJI = "facts_with_emoji"
     STORY_BASED = "story_based"
     GUIDE_BASED = "guide_based"
